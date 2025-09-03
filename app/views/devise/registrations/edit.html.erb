@@ -1,0 +1,238 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+          <h2 class="mb-0">
+            <i class="fas fa-user-edit me-2"></i>
+            تعديل الملف الشخصي
+          </h2>
+        </div>
+
+        <div class="card-body p-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+                      html: { method: :put, class: "needs-validation", novalidate: true }) do |f| %>
+            <%= render "devise/shared/error_messages", resource: resource %>
+
+            <!-- البريد الإلكتروني -->
+            <div class="mb-4">
+              <%= f.label :email, "البريد الإلكتروني", class: "form-label fw-bold text-primary" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-envelope text-primary"></i>
+                </span>
+                <%= f.email_field :email, class: "form-control ps-0", autofocus: true,
+                                 autocomplete: "email", required: true %>
+              </div>
+            </div>
+
+            <!-- إذا كان هناك بريد بانتظار التأكيد -->
+            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+              <div class="alert alert-warning">
+                <i class="fas fa-clock me-2"></i>
+                في انتظار تأكيد البريد: <strong><%= resource.unconfirmed_email %></strong>
+              </div>
+            <% end %>
+
+            <!-- كلمة المرور الجديدة -->
+            <div class="mb-4">
+              <%= f.label :password, "كلمة المرور الجديدة", class: "form-label fw-bold text-primary" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-lock text-primary"></i>
+                </span>
+                <%= f.password_field :password, class: "form-control ps-0",
+                                    autocomplete: "new-password",
+                                    placeholder: "اتركها فارغة إذا لم ترد التغيير" %>
+                <button type="button" class="btn btn-outline-secondary toggle-password">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <% if @minimum_password_length %>
+                <div class="form-text text-muted">
+                  <i class="fas fa-info-circle me-1"></i>
+                  <%= @minimum_password_length %> أحرف على الأقل
+                </div>
+              <% end %>
+            </div>
+
+            <!-- تأكيد كلمة المرور -->
+            <div class="mb-4">
+              <%= f.label :password_confirmation, "تأكيد كلمة المرور", class: "form-label fw-bold text-primary" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-lock text-primary"></i>
+                </span>
+                <%= f.password_field :password_confirmation, class: "form-control ps-0",
+                                    autocomplete: "new-password" %>
+                <button type="button" class="btn btn-outline-secondary toggle-password">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- كلمة المرور الحالية -->
+            <div class="mb-4">
+              <%= f.label :current_password, "كلمة المرور الحالية", class: "form-label fw-bold text-primary" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-key text-primary"></i>
+                </span>
+                <%= f.password_field :current_password, class: "form-control ps-0",
+                                    autocomplete: "current-password", required: true %>
+                <button type="button" class="btn btn-outline-secondary toggle-password">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="form-text text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                نحتاج كلمة المرور الحالية لتأكيد التغييرات
+              </div>
+            </div>
+
+            <!-- زر التحديث -->
+            <div class="d-grid mb-4">
+              <%= f.submit "تحديث البيانات", class: "btn btn-primary btn-lg fw-bold" %>
+            </div>
+          <% end %>
+
+          <hr class="my-4">
+
+          <!-- قسم حذف الحساب -->
+          <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+              <h4 class="mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                منطقة الخطر
+              </h4>
+            </div>
+            <div class="card-body">
+              <h5 class="text-danger">حذف الحساب</h5>
+              <p class="text-muted">غير سعيد بالخدمة؟ يمكنك حذف حسابك بشكل دائم.</p>
+
+              <%= button_to registration_path(resource_name),
+                  method: :delete,
+                  data: {
+                    confirm: "هل أنت متأكد من أنك تريد حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.",
+                    turbo_confirm: "هل أنت متأكد من أنك تريد حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه."
+                  },
+                  class: "btn btn-outline-danger w-100" do %>
+                <i class="fas fa-trash-alt me-2"></i>حذف حسابي
+              <% end %>
+            </div>
+          </div>
+
+          <!-- روابط إضافية -->
+          <div class="text-center mt-4">
+            <%= link_to :back, class: "btn btn-outline-secondary me-2" do %>
+              <i class="fas fa-arrow-left me-1"></i> رجوع
+            <% end %>
+            <%= link_to "الصفحة الرئيسية", root_path, class: "btn btn-outline-primary" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.toggle-password {
+  border-left: none;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #0d6efd, #0a58ca);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
+}
+
+.btn-outline-danger {
+  transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.alert {
+  border-left: 4px solid #ffc107;
+}
+
+.card-border-danger {
+  border: 2px solid #dc3545;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // إظهار/إخفاء كلمة المرور
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+      const input = this.closest('.input-group').querySelector('input');
+      const icon = this.querySelector('i');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  });
+
+  // التحقق من صحة النموذج
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+
+  // تأكيد حذف الحساب
+  const deleteButton = document.querySelector('.btn-outline-danger');
+  if (deleteButton) {
+    deleteButton.addEventListener('click', function(e) {
+      if (!confirm('هل أنت متأكد من أنك تريد حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+        e.preventDefault();
+      }
+    });
+  }
+});
+</script>

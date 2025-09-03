@@ -1,0 +1,182 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="text-center mb-5">
+        <h1 class="display-4 text-primary">كيف تعمل منصتنا</h1>
+        <p class="lead">طريقة سهلة وآمنة للربط بين السائقين والركاب</p>
+      </div>
+
+      <div class="row">
+        <!-- للسائقين -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow">
+            <div class="card-header bg-success text-white text-center">
+              <h4><i class="fas fa-car me-2"></i>للسائقين</h4>
+            </div>
+            <div class="card-body">
+              <div class="steps">
+                <div class="step mb-4">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h5>أنشئ حساب سائق</h5>
+                    <p>سجل في المنصة واختر دور "سائق" لتبدأ بنشر رحلاتك</p>
+                  </div>
+                </div>
+
+                <div class="step mb-4">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h5>انشر رحلتك</h5>
+                    <p>أضف تفاصيل رحلتك: المدينة المنطلقة، المدينة الواقفة، وقت المغادرة، عدد المقاعد، والسعر</p>
+                  </div>
+                </div>
+
+                <div class="step mb-4">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h5>ادفع تكاليف الرحلة</h5>
+                    <p>شارك التكاليف مع الركاب ووفر في مصاريف السفر</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h5>كن اجتماعياً</h5>
+                    <p>تعرف على أشخاص جدد واجعل رحلتك أكثر متعة</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- للركاب -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow">
+            <div class="card-header bg-info text-white text-center">
+              <h4><i class="fas fa-users me-2"></i>للركاب</h4>
+            </div>
+            <div class="card-body">
+              <div class="steps">
+                <div class="step mb-4">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h5>أنشئ حساب راكب</h5>
+                    <p>سجل في المنصة واختر دور "راكب" للبحث عن رحلات</p>
+                  </div>
+                </div>
+
+                <div class="step mb-4">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h5>ابحث عن رحلة</h5>
+                    <p>استخدم صفحة الرحلات للعثور على رحلة تناسب مسارك ووقت سفرك</p>
+                  </div>
+                </div>
+
+                <div class="step mb-4">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h5>احجز مقعدك</h5>
+                    <p>اختر عدد المقاعد المطلوبة وأرسل طلب الحجز للسائق</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h5>استمتع برحلتك</h5>
+                    <p>انتظر موافقة السائق واستمتع برحلة مريحة وبسعر مناسب</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- نصائح وإرشادات -->
+      <div class="row mt-5">
+        <div class="col-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h3 class="text-center mb-4">نصائح للاستخدام الآمن</h3>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <div class="text-center">
+                    <i class="fas fa-shield-alt fa-2x text-warning mb-2"></i>
+                    <h5>تحقق من الهوية</h5>
+                    <p>تأكد من هوية السائق/الراكب قبل الرحلة</p>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="text-center">
+                    <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+                    <h5>تواصل مسبقاً</h5>
+                    <p>تحدث مع الطرف الآخر قبل الرحلة للاتفاق على التفاصيل</p>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="text-center">
+                    <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                    <h5>دفع آمن</h5>
+                    <p>اتفق على طريقة الدفع مسبقاً وتجنب الدفع المسبق الكامل</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- روابط سريعة -->
+      <div class="text-center mt-5">
+        <% if user_signed_in? %>
+          <%= link_to 'استعرض الرحلات', rides_path, class: 'btn btn-primary btn-lg me-3' %>
+          <%= link_to 'لوحة التحكم', dashboard_path, class: 'btn btn-outline-primary btn-lg' %>
+        <% else %>
+          <%= link_to 'انضم إلينا', new_user_registration_path, class: 'btn btn-primary btn-lg me-3' %>
+          <%= link_to 'تسجيل الدخول', new_user_session_path, class: 'btn btn-outline-primary btn-lg me-3' %>
+          <%= link_to 'استعرض الرحلات', rides_path, class: 'btn btn-success btn-lg' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.steps .step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h5 {
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.step-content p {
+  color: #6c757d;
+  margin: 0;
+}
+</style>

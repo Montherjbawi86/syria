@@ -1,0 +1,44 @@
+ar:
+  devise:
+    shared:
+      links:
+        sign_in: 'تسجيل الدخول'
+        sign_up: 'إنشاء حساب'
+        forgot_password: 'نسيت كلمة المرور؟'
+        sign_in_with_provider: 'تسجيل الدخول بواسطة %{provider}'
+    registrations:
+      new:
+        title: 'إنشاء حساب جديد'
+      edit:
+        title: 'تعديل الحساب'
+    sessions:
+      new:
+        title: 'تسجيل الدخول'
+    passwords:
+      new:
+        title: 'نسيت كلمة المرور'
+      edit:
+        title: 'تغيير كلمة المرور'
+    confirmations:
+      new:
+        title: 'إعادة إرسال تعليمات التفعيل'
+    unlocks:
+      new:
+        title: 'إعادة إرسال تعليمات فتح الحساب'
+  activerecord:
+    attributes:
+      user:
+        email: 'البريد الإلكتروني'
+        password: 'كلمة المرور'
+        password_confirmation: 'تأكيد كلمة المرور'
+        current_password: 'كلمة المرور الحالية'
+        name: 'الاسم'
+        phone: 'رقم الهاتف'
+        role: 'الدور'
+    errors:
+      messages:
+        blank: 'لا يمكن أن يكون فارغاً'
+        invalid: 'غير صحيح'
+        taken: 'مستخدم مسبقاً'
+        too_short: 'قصير جداً (الحد الأدنى %{count} حروف)'
+        too_long: 'طويل جداً (الحد الأقصى %{count} حروف)'

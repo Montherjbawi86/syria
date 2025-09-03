@@ -1,0 +1,269 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center py-4">
+          <h2 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>
+            إنشاء حساب جديد
+          </h2>
+          <p class="mb-0 mt-2">انضم إلى منصة وصلني بطريقك</p>
+        </div>
+
+        <div class="card-body p-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+                      html: { class: "needs-validation", novalidate: true }) do |f| %>
+            <%= render "devise/shared/error_messages", resource: resource %>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <%= f.label :name, "الاسم الكامل", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-user text-primary"></i>
+                  </span>
+                  <%= f.text_field :name, class: "form-control ps-0", required: true,
+                                  placeholder: "أدخل اسمك الكامل" %>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <%= f.label :phone, "رقم الهاتف", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-phone text-primary"></i>
+                  </span>
+                  <%= f.text_field :phone, class: "form-control ps-0", required: true,
+                                  placeholder: "09xxxxxxxx" %>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :email, "البريد الإلكتروني", class: "form-label fw-bold text-primary" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-envelope text-primary"></i>
+                </span>
+                <%= f.email_field :email, class: "form-control ps-0", required: true,
+                                 placeholder: "example@email.com" %>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :role, "نوع الحساب", class: "form-label fw-bold text-primary" %>
+              <div class="role-selector">
+                <div class="row">
+                  <div class="col-md-4 mb-2">
+                    <input type="radio" class="btn-check" name="user[role]" id="role_passenger" value="passenger" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary w-100 py-3" for="role_passenger">
+                      <i class="fas fa-users fa-2x mb-2"></i>
+                      <h6 class="mb-1">راكب</h6>
+                      <small class="text-muted">احجز مقعداً في الرحلات</small>
+                    </label>
+                  </div>
+                  <div class="col-md-4 mb-2">
+                    <input type="radio" class="btn-check" name="user[role]" id="role_driver" value="driver" autocomplete="off">
+                    <label class="btn btn-outline-primary w-100 py-3" for="role_driver">
+                      <i class="fas fa-car fa-2x mb-2"></i>
+                      <h6 class="mb-1">سائق</h6>
+                      <small class="text-muted">أضف رحلاتك واجذب الركاب</small>
+                    </label>
+                  </div>
+                  <div class="col-md-4 mb-2">
+                    <input type="radio" class="btn-check" name="user[role]" id="role_admin" value="admin" autocomplete="off">
+                    <label class="btn btn-outline-danger w-100 py-3" for="role_admin">
+                      <i class="fas fa-crown fa-2x mb-2"></i>
+                      <h6 class="mb-1">مدير</h6>
+                      <small class="text-muted">إدارة النظام والتحكم</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- حقل كود المدير (يظهر فقط عند اختيار مدير) -->
+            <div class="mb-3" id="admin-code-field" style="display: none;">
+              <%= label_tag :admin_code, "كود المدير", class: "form-label fw-bold text-danger" %>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fas fa-key text-danger"></i>
+                </span>
+                <%= text_field_tag :admin_code, nil, class: "form-control ps-0",
+                                  placeholder: "أدخل كود المدير الخاص" %>
+              </div>
+              <small class="form-text text-muted">مطلوب لإنشاء حساب مدير</small>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <%= f.label :password, "كلمة المرور", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-lock text-primary"></i>
+                  </span>
+                  <%= f.password_field :password, class: "form-control ps-0", required: true,
+                                      placeholder: "أدخل كلمة المرور" %>
+                  <button type="button" class="btn btn-outline-secondary toggle-password">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <% if @minimum_password_length %>
+                  <div class="form-text">(<%= @minimum_password_length %> أحرف على الأقل)</div>
+                <% end %>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <%= f.label :password_confirmation, "تأكيد كلمة المرور", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-lock text-primary"></i>
+                  </span>
+                  <%= f.password_field :password_confirmation, class: "form-control ps-0", required: true,
+                                      placeholder: "أعد إدخال كلمة المرور" %>
+                  <button type="button" class="btn btn-outline-secondary toggle-password">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-check mb-4">
+              <input type="checkbox" class="form-check-input" id="accept_terms" required>
+              <label class="form-check-label text-muted" for="accept_terms">
+                أوافق على <a href="#" class="text-primary">شروط الاستخدام</a> و <a href="#" class="text-primary">سياسة الخصوصية</a>
+              </label>
+            </div>
+
+            <div class="d-grid">
+              <%= f.submit "إنشاء حساب", class: "btn btn-primary btn-lg fw-bold" %>
+            </div>
+          <% end %>
+
+          <hr class="my-4">
+
+          <div class="text-center">
+            <p class="text-muted mb-2">لديك حساب بالفعل؟</p>
+            <%= link_to "تسجيل الدخول", new_user_session_path, class: "btn btn-outline-primary" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.role-selector .btn {
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.role-selector .btn-check:checked + .btn {
+  border-color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.1);
+  transform: translateY(-2px);
+}
+
+.role-selector .btn-check:checked + .btn-outline-danger {
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.role-selector .btn:hover {
+  border-color: #0d6efd;
+}
+
+.role-selector .btn-outline-danger:hover {
+  border-color: #dc3545;
+}
+
+.toggle-password {
+  border-left: none;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+#admin-code-field {
+  transition: all 0.3s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // إظهار/إخفاء كلمة المرور
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+      const input = this.closest('.input-group').querySelector('input');
+      const icon = this.querySelector('i');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+  });
+
+  // إظهار/إخفاء حقل كود المدير
+  document.querySelectorAll('input[name="user[role]"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const adminCodeField = document.getElementById('admin-code-field');
+      if (this.value === 'admin') {
+        adminCodeField.style.display = 'block';
+      } else {
+        adminCodeField.style.display = 'none';
+      }
+    });
+  });
+
+  // التحقق من صحة النموذج
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      const termsCheckbox = document.getElementById('accept_terms');
+      if (!termsCheckbox.checked) {
+        event.preventDefault();
+        event.stopPropagation();
+        termsCheckbox.classList.add('is-invalid');
+      }
+
+      // التحقق من كود المدير إذا تم اختيار مدير
+      const adminRole = document.querySelector('input[name="user[role]"][value="admin"]');
+      const adminCodeField = document.getElementById('admin-code-field');
+      const adminCodeInput = document.getElementById('admin_code');
+
+      if (adminRole.checked && adminCodeField.style.display === 'block') {
+        if (!adminCodeInput.value.trim()) {
+          event.preventDefault();
+          event.stopPropagation();
+          adminCodeInput.classList.add('is-invalid');
+          adminCodeInput.focus();
+        }
+      }
+
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+});
+</script>

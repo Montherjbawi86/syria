@@ -1,0 +1,416 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary">
+          <i class="fas fa-car me-2"></i>إدارة الرحلات
+        </h1>
+        <div>
+          <span class="badge bg-primary fs-6">
+            <i class="fas fa-list me-1"></i>
+            <%= @rides.count %> رحلة
+          </span>
+        </div>
+      </div>
+
+      <!-- فلتر الرحلات -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <label class="form-label fw-bold">فلترة بالسائق:</label>
+              <select class="form-select" id="driverFilter">
+                <option value="">جميع السائقين</option>
+                <% User.driver.each do |driver| %>
+                  <option value="<%= driver.id %>"><%= driver.name %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-3 mb-2">
+              <label class="form-label fw-bold">فلترة بالمدينة:</label>
+              <select class="form-select" id="cityFilter">
+                <option value="">جميع المدن</option>
+                <% @cities.each do |city| %>
+                  <option value="<%= city %>"><%= city %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-md-3 mb-2">
+              <label class="form-label fw-bold">حالة المقاعد:</label>
+              <select class="form-select" id="seatsFilter">
+                <option value="">جميع الرحلات</option>
+                <option value="available">متاحة</option>
+                <option value="full">مكتملة</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-2 d-flex align-items-end">
+              <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                <i class="fas fa-refresh me-1"></i>إعادة تعيين
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <% if @rides.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover" id="ridesTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>السائق</th>
+                    <th>المسار</th>
+                    <th>الوقت</th>
+                    <th>المقاعد</th>
+                    <th>السعر</th>
+                    <th>الحجوزات</th>
+                    <th>التاريخ</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @rides.each do |ride| %>
+                    <tr class="ride-row"
+                        data-driver="<%= ride.driver.id %>"
+                        data-from-city="<%= ride.from_city %>"
+                        data-to-city="<%= ride.to_city %>"
+                        data-seats="<%= ride.available_seats > 0 ? 'available' : 'full' %>">
+                      <td><%= ride.id %></td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0">
+                            <div class="bg-success text-white rounded-circle p-2">
+                              <i class="fas fa-user"></i>
+                            </div>
+                          </div>
+                          <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0"><%= ride.driver.name %></h6>
+                            <small class="text-muted"><%= ride.driver.phone %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <strong class="text-primary"><%= ride.from_city %></strong>
+                        <i class="fas fa-arrow-left mx-2 text-secondary"></i>
+                        <strong class="text-success"><%= ride.to_city %></strong>
+                        <% if ride.notes.present? %>
+                          <br>
+                          <small class="text-muted" title="<%= ride.notes %>">
+                            <i class="fas fa-sticky-note"></i>
+                            <%= truncate(ride.notes, length: 30) %>
+                          </small>
+                        <% end %>
+                      </td>
+                      <td>
+                        <% if ride.departure_time %>
+                          <div class="text-nowrap">
+                            <i class="fas fa-clock text-warning me-1"></i>
+                            <%= l(ride.departure_time, format: :short) %>
+                          </div>
+                          <small class="text-muted">
+                            <%= time_ago_in_words(ride.departure_time) %>
+                          </small>
+                        <% else %>
+                          <span class="text-muted">غير محدد</span>
+                        <% end %>
+                      </td>
+                      <td>
+                        <span class="badge bg-<%= ride.available_seats > 0 ? 'success' : 'danger' %>">
+                          <i class="fas fa-chair me-1"></i>
+                          <%= ride.available_seats %> / <%= ride.available_seats + ride.bookings.sum(:seats) %>
+                        </span>
+                      </td>
+                      <td>
+                        <span class="fw-bold text-success">
+                          <%= number_to_currency(ride.price) %>
+                        </span>
+                        <small class="text-muted d-block">للمقعد</small>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">
+                          <i class="fas fa-ticket me-1"></i>
+                          <%= ride.bookings.count %>
+                        </span>
+                      </td>
+                      <td>
+                        <div class="text-nowrap">
+                          <%= l(ride.created_at, format: :short) %>
+                        </div>
+                        <small class="text-muted">
+                          <%= time_ago_in_words(ride.created_at) %>
+                        </small>
+                      </td>
+                      <td>
+                        <div class="btn-group">
+                          <!-- عرض معلومات الرحلة -->
+                          <button class="btn btn-info btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#rideModal<%= ride.id %>">
+                            <i class="fas fa-eye"></i>
+                          </button>
+
+                          <!-- حذف الرحلة -->
+                          <button class="btn btn-danger btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteRideModal<%= ride.id %>">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="text-center py-5">
+              <i class="fas fa-car fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted">لا يوجد رحلات</h5>
+              <p class="text-muted">لم يتم إنشاء أي رحلات حتى الآن</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals للرحلات -->
+<% @rides.each do |ride| %>
+  <!-- Modal لعرض الرحلة -->
+  <div class="modal fade" id="rideModal<%= ride.id %>" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">تفاصيل الرحلة #<%= ride.id %></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">معلومات الرحلة</h6>
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>من:</strong>
+                    <span class="fw-bold"><%= ride.from_city %></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>إلى:</strong>
+                    <span class="fw-bold"><%= ride.to_city %></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>وقت المغادرة:</strong>
+                    <span><%= ride.departure_time ? l(ride.departure_time, format: :long) : 'غير محدد' %></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>المقاعد المتاحة:</strong>
+                    <span class="badge bg-<%= ride.available_seats > 0 ? 'success' : 'danger' %>">
+                      <%= ride.available_seats %>
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>السعر:</strong>
+                    <span class="fw-bold text-success"><%= number_to_currency(ride.price) %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">معلومات السائق</h6>
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="flex-shrink-0">
+                      <div class="bg-success text-white rounded-circle p-2">
+                        <i class="fas fa-user"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <h6 class="mb-0"><%= ride.driver.name %></h6>
+                      <small class="text-muted"><%= ride.driver.email %></small>
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <strong>الهاتف:</strong> <%= ride.driver.phone %>
+                  </div>
+                  <div>
+                    <strong>عدد الرحلات:</strong> <%= ride.driver.rides.count %>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <% if ride.notes.present? %>
+              <div class="col-12 mb-3">
+                <h6 class="text-primary">ملاحظات</h6>
+                <div class="card">
+                  <div class="card-body">
+                    <%= ride.notes %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="col-12">
+              <h6 class="text-primary">الحجوزات (<%= ride.bookings.count %>)</h6>
+              <% if ride.bookings.any? %>
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>الراكب</th>
+                        <th>المقاعد</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% ride.bookings.each do |booking| %>
+                        <tr>
+                          <td><%= booking.passenger.name %></td>
+                          <td><%= booking.seats %></td>
+                          <td>
+                            <span class="badge bg-<%= booking_status_color(booking.status) %>">
+                              <%= booking.status %>
+                            </span>
+                          </td>
+                          <td><%= l(booking.created_at, format: :short) %></td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <p class="text-muted">لا توجد حجوزات لهذه الرحلة</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal لتأكيد الحذف -->
+  <div class="modal fade" id="deleteRideModal<%= ride.id %>" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">تأكيد حذف الرحلة</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>هل أنت متأكد من حذف الرحلة التالية؟</p>
+          <div class="alert alert-danger">
+            <strong>المسار:</strong> <%= ride.from_city %> → <%= ride.to_city %><br>
+            <strong>السائق:</strong> <%= ride.driver.name %><br>
+            <strong>الوقت:</strong> <%= ride.departure_time ? l(ride.departure_time, format: :short) : 'غير محدد' %>
+          </div>
+          <p class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            تحذير: هذا الإجراء سيحذف أيضاً جميع الحجوزات المرتبطة بهذه الرحلة.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+
+          <!-- استخدام form مباشرة بدون مسار مسمى -->
+          <%= form_with(url: "/admin/rides/#{ride.id}", method: :delete, class: "d-inline") do %>
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('هل أنت متأكد من حذف هذه الرحلة؟')">
+              نعم، احذف
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<style>
+.card {
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+  background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+  border-radius: 0.375rem;
+}
+
+.modal-header {
+  border-bottom: 2px solid #0d6efd;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.ride-row {
+  transition: all 0.3s ease;
+}
+
+.ride-row:hover {
+  transform: translateX(4px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // فلترة الرحلات
+  const driverFilter = document.getElementById('driverFilter');
+  const cityFilter = document.getElementById('cityFilter');
+  const seatsFilter = document.getElementById('seatsFilter');
+  const rideRows = document.querySelectorAll('.ride-row');
+
+  function filterRides() {
+    const driverValue = driverFilter.value;
+    const cityValue = cityFilter.value.toLowerCase();
+    const seatsValue = seatsFilter.value;
+
+    rideRows.forEach(row => {
+      const driverId = row.getAttribute('data-driver');
+      const fromCity = row.getAttribute('data-from-city').toLowerCase();
+      const toCity = row.getAttribute('data-to-city').toLowerCase();
+      const seatsStatus = row.getAttribute('data-seats');
+
+      const showDriver = !driverValue || driverId === driverValue;
+      const showCity = !cityValue || fromCity.includes(cityValue) || toCity.includes(cityValue);
+      const showSeats = !seatsValue || seatsStatus === seatsValue;
+
+      row.style.display = (showDriver && showCity && showSeats) ? '' : 'none';
+    });
+  }
+
+  driverFilter.addEventListener('change', filterRides);
+  cityFilter.addEventListener('change', filterRides);
+  seatsFilter.addEventListener('change', filterRides);
+
+  // إعادة تعيين الفلتر
+  window.resetFilters = function() {
+    driverFilter.value = '';
+    cityFilter.value = '';
+    seatsFilter.value = '';
+    rideRows.forEach(row => row.style.display = '');
+  };
+});
+</script>

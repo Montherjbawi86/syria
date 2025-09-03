@@ -1,0 +1,119 @@
+<div class="hero-section">
+  <div class="container">
+    <h1 class="display-3 fw-bold mb-4">وصلني بطريقك</h1>
+    <p class="lead mb-5">منصة سورية للربط بين السائقين والراغبين بالسفر بين المدن</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <% if user_signed_in? %>
+        <% if current_user.driver? %>
+          <%= link_to "أضف رحلة جديدة", new_ride_path, class: "btn btn-primary btn-lg" %>
+        <% else %>
+          <%= link_to "استعرض الرحلات", rides_path, class: "btn btn-primary btn-lg" %>
+        <% end %>
+        <%= link_to "لوحة التحكم", dashboard_path, class: "btn btn-outline-light btn-lg" %>
+      <% else %>
+        <%= link_to "إنشاء حساب", new_user_registration_path, class: "btn btn-primary btn-lg" %>
+        <%= link_to "تسجيل الدخول", new_user_session_path, class: "btn btn-outline-light btn-lg" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Features Section -->
+  <div class="row mb-5">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 text-center border-0">
+        <div class="card-body p-4">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-car fa-3x text-gradient"></i>
+          </div>
+          <h4 class="card-title fw-bold">سجل كسائق</h4>
+          <p class="card-text">أضف رحلتك واجعل الآخرين ينضمون إليك في الرحلة ويشاركونك التكاليف</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 text-center border-0">
+        <div class="card-body p-4">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-users fa-3x text-gradient"></i>
+          </div>
+          <h4 class="card-title fw-bold">انضم كراكب</h4>
+          <p class="card-text">ابحث عن رحلة تناسبك وانضم إلى سائق متجه إلى وجهتك</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 text-center border-0">
+        <div class="card-body p-4">
+          <div class="feature-icon mb-3">
+            <i class="fas fa-hand-holding-usd fa-3x text-gradient"></i>
+          </div>
+          <h4 class="card-title fw-bold">وفر في التكاليف</h4>
+          <p class="card-text">شارك تكاليف السفر مع الآخرين ووفر المال والطاقة</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest Rides -->
+  <% if @rides.any? %>
+    <div class="row mb-5">
+      <div class="col-12">
+        <h2 class="text-center mb-4 fw-bold">أحدث الرحلات المتاحة</h2>
+        <div class="row">
+          <% @rides.each do |ride| %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100 ride-card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title fw-bold">
+                      <%= ride.from_city %>
+                      <i class="fas fa-arrow-left text-primary"></i>
+                      <%= ride.to_city %>
+                    </h5>
+                    <span class="badge bg-success"><%= ride.available_seats %> مقاعد</span>
+                  </div>
+
+                  <div class="ride-details mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="far fa-calendar-alt text-primary me-2"></i>
+                      <span><%= ride.departure_time.strftime("%Y/%m/%d %H:%M") %></span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fas fa-money-bill-wave text-primary me-2"></i>
+                      <span class="fw-bold"><%= ride.price %> ل.س</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-user text-primary me-2"></i>
+                      <span><%= ride.driver.name %></span>
+                    </div>
+                  </div>
+
+                  <div class="d-grid">
+                    <%= link_to "عرض التفاصيل", ride_path(ride), class: "btn btn-primary btn-sm" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="text-center mt-4">
+          <%= link_to "عرض جميع الرحلات", rides_path, class: "btn btn-outline-primary btn-lg" %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="text-center py-5">
+      <div class="empty-state">
+        <i class="fas fa-route fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">لا توجد رحلات حالياً</h3>
+        <p class="text-muted">كن أول من يضيف رحلة إلى المنصة</p>
+        <% if user_signed_in? && current_user.driver? %>
+          <%= link_to "أضف رحلة جديدة", new_ride_path, class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

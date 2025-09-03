@@ -1,0 +1,18 @@
+<div class="ride-details mb-4 p-3 bg-light rounded">
+  <h5>تفاصيل الرحلة:</h5>
+  <div class="row">
+    <div class="col-md-6">
+      <p><strong>من:</strong> <%= ride.from_city %></p>
+      <p><strong>إلى:</strong> <%= ride.to_city %></p>
+      <p><strong>وقت المغادرة:</strong> <%= l(ride.departure_time, format: :long) %></p>
+    </div>
+    <div class="col-md-6">
+      <p><strong>السعر للمقعد:</strong> <%= number_to_currency(ride.price) %></p>
+      <p><strong>المقاعد المتاحة:</strong> <%= ride.available_seats %></p>
+      <p><strong>السائق:</strong> <%= ride.driver.name %></p>
+    </div>
+  </div>
+  <% if ride.notes.present? %>
+    <p><strong>ملاحظات:</strong> <%= ride.notes %></p>
+  <% end %>
+</div>

@@ -1,0 +1,43 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">حجز مقعد في الرحلة</h4>
+        </div>
+        <div class="card-body">
+          <%= render 'ride_details', ride: @ride %>
+
+          <%= form_with(model: [@ride, @booking], url: ride_bookings_path(@ride), local: true) do |form| %>
+            <% if @booking.errors.any? %>
+              <div class="alert alert-danger">
+                <h5>الرجاء إصلاح الأخطاء التالية:</h5>
+                <ul>
+                  <% @booking.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= form.label :seats, "عدد المقاعد", class: "form-label" %>
+              <%= form.number_field :seats, class: "form-control", min: 1, max: @ride.available_seats, required: true %>
+              <small class="form-text text-muted">المقاعد المتاحة: <%= @ride.available_seats %></small>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :notes, "ملاحظات إضافية", class: "form-label" %>
+              <%= form.text_area :notes, class: "form-control", rows: 3 %>
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= form.submit "تأكيد الحجز", class: "btn btn-success btn-lg" %>
+              <%= link_to "رجوع", ride_path(@ride), class: "btn btn-secondary btn-lg" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

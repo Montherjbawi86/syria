@@ -1,0 +1,2 @@
+module Rides::BookingsHelper
+end

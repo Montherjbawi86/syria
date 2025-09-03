@@ -1,0 +1,122 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-warning text-dark py-4">
+          <div class="text-center">
+            <h2 class="mb-1">
+              <i class="fas fa-edit me-2"></i>تعديل الرحلة
+            </h2>
+            <p class="mb-0">قم بتعديل معلومات رحلتك</p>
+          </div>
+        </div>
+
+        <div class="card-body p-5">
+          <%= form_with(model: @ride, local: true, class: "needs-validation", novalidate: true) do |form| %>
+            <% if @ride.errors.any? %>
+              <div class="alert alert-danger">
+                <h5>يوجد أخطاء يجب تصحيحها:</h5>
+                <ul>
+                  <% @ride.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <%= form.label :from_city, "المدينة المنطلقة", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                  </span>
+                  <%= form.text_field :from_city, class: "form-control", required: true %>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <%= form.label :to_city, "المدينة الواصلة", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                  </span>
+                  <%= form.text_field :to_city, class: "form-control", required: true %>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <%= form.label :departure_time, "تاريخ ووقت المغادرة", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="fas fa-calendar-alt text-primary"></i>
+                  </span>
+                  <%= form.datetime_local_field :departure_time, class: "form-control", required: true %>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <%= form.label :available_seats, "عدد المقاعد المتاحة", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="fas fa-users text-primary"></i>
+                  </span>
+                  <%= form.number_field :available_seats, class: "form-control", required: true,
+                                      min: 0, max: 10 %>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <%= form.label :price, "سعر المقعد (ل.س)", class: "form-label fw-bold text-primary" %>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="fas fa-money-bill-wave text-primary"></i>
+                  </span>
+                  <%= form.number_field :price, class: "form-control", required: true,
+                                      min: 0, step: 500 %>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <%= form.label :notes, "ملاحظات إضافية", class: "form-label fw-bold text-primary" %>
+              <%= form.text_area :notes, class: "form-control", rows: 4 %>
+            </div>
+
+            <div class="d-grid gap-2">
+              <%= form.submit "تحديث الرحلة", class: "btn btn-warning btn-lg fw-bold py-3" %>
+              <%= link_to "عرض التفاصيل", @ride, class: "btn btn-outline-primary btn-lg" %>
+              <%= link_to "إلغاء", rides_path, class: "btn btn-outline-secondary btn-lg" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+  border: none;
+  color: white;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #e0a800 0%, #e36407 100%);
+  color: white;
+}
+</style>
