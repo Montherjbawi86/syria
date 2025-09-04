@@ -27,6 +27,7 @@ gem 'kaminari' # للترقيم
 gem 'rails-i18n' # للدعم العربي
 gem 'sqlite3', group: [:development, :test]
 gem 'pg', group: :production
+gem 'nokogiri', '>= 1.13.10'
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
