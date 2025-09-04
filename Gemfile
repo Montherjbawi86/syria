@@ -16,7 +16,7 @@ gem "sassc-rails"
 gem "importmap-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
-
+gem 'bundler'
 # UI
 gem "bootstrap", "~> 5.1"
 gem "jquery-rails"

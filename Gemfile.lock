@@ -372,6 +372,7 @@ DEPENDENCIES
   bootsnap
   bootstrap (~> 5.1)
   brakeman
+  bundler
   capybara
   dartsass-rails
   debug
