@@ -7,7 +7,6 @@ gem "rails", "~> 7.2.2", ">= 7.2.2.2"
 gem "sprockets-rails"
 gem "dartsass-rails"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -26,6 +25,9 @@ gem 'jquery-rails'
 gem 'font-awesome-rails'
 gem 'kaminari' # للترقيم
 gem 'rails-i18n' # للدعم العربي
+gem 'sqlite3', group: [:development, :test]
+gem 'pg', group: :production
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
