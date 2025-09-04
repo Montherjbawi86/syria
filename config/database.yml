@@ -80,6 +80,10 @@ test:
 #
 production:
   <<: *default
-  database: wasalani_bitariqik_production
-  username: wasalani_bitariqik
-  password: <%= ENV["WASALANI_BITARIQIK_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
+
+#production:
+ # <<: *default
+  #database: wasalani_bitariqik_production
+  #username: wasalani_bitariqik
+  #password: <%= ENV["WASALANI_BITARIQIK_DATABASE_PASSWORD"] %>
