@@ -27,8 +27,6 @@ gem 'jquery-rails'
 gem 'font-awesome-rails'
 gem 'kaminari' # للترقيم
 gem 'rails-i18n' # للدعم العربي
-gem 'sqlite3', group: [:development, :test]
-gem 'pg', group: :production
 gem 'nokogiri', '>= 1.13.10'
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
@@ -36,8 +34,6 @@ gem 'nokogiri', '>= 1.13.10'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
-# Gemfile
- # or your Ruby version
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -49,7 +45,10 @@ gem "bootsnap", require: false
 # gem "image_processing", "~> 1.2"
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  # Database
+  gem "sqlite3"
+
+  # Debugging
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
@@ -59,6 +58,10 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+group :production do
+  gem "pg"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
@@ -66,11 +69,7 @@ group :development do
   # Highlight the fine-grained location where an error occurred [https://github.com/ruby/error_highlight]
   gem "error_highlight", ">= 0.4.0", platforms: [ :ruby ]
 end
-group :development do
-  gem 'sqlite3'  # If you have it
-    gem 'debug', platforms: %i[ mri mingw x64_mingw ]
 
-end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
