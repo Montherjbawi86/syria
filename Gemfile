@@ -6,6 +6,7 @@ gem "rails", "~> 7.2.2", ">= 7.2.2.2"
 
 # Web server
 gem "puma", ">= 5.0"
+gem 'rack'
 
 # Assets
 gem "sprockets-rails"
