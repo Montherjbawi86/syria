@@ -1,81 +1,56 @@
 source "https://rubygems.org"
-ruby '3.1.2'
+ruby "3.1.2"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+# Rails
 gem "rails", "~> 7.2.2", ">= 7.2.2.2"
-# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
+
+# Web server
+gem "puma", ">= 5.0"
+
+# Assets
 gem "sprockets-rails"
 gem "dartsass-rails"
-# Use postgresql as the database for Active Record
-# Use the Puma web server [https://github.com/puma/puma]
-gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+gem "sassc-rails"
+
+# JavaScript / Frontend
 gem "importmap-rails"
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+
+# UI
+gem "bootstrap", "~> 5.1"
+gem "jquery-rails"
+gem "font-awesome-rails"
+
+# Auth & Pagination
+gem "devise"
+gem "kaminari"         # للترقيم
+gem "rails-i18n"       # للدعم العربي
+
+# Database
+gem "pg", group: :production
+gem "sqlite3", group: [:development, :test]
+
+# XML/HTML parsing
+gem "nokogiri", ">= 1.13.10"
+
+# JSON API builder
 gem "jbuilder"
-gem 'sassc-rails'
 
-# Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
-gem 'devise'
-gem 'bootstrap', '~> 5.1'
-gem 'jquery-rails'
-gem 'font-awesome-rails'
-gem 'kaminari' # للترقيم
-gem 'rails-i18n' # للدعم العربي
-gem 'nokogiri', '>= 1.13.10'
-
-# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
-# gem "kredis"
-
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ windows jruby ]
-
-# Reduces boot times through caching; required in config/boot.rb
+# Misc
+gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
-
-group :development, :test do
-  # Database
-  gem "sqlite3"
-
-  # Debugging
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+# Security & Linting (development only, not loaded in prod)
+group :development do
+  gem "web-console"
+  gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
+  gem "debug", platforms: [:mri]
   gem "brakeman", require: false
-
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
 
-group :production do
-  gem "pg"
-end
-
-group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
-
-  # Highlight the fine-grained location where an error occurred [https://github.com/ruby/error_highlight]
-  gem "error_highlight", ">= 0.4.0", platforms: [ :ruby ]
-end
-
-group :development do
-  gem 'debug', platforms: [:mri]
-end
-
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
 end
