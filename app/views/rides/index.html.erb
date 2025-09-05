@@ -1,0 +1,214 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="text-primary fw-bold mb-2">الرحلات المتاحة</h1>
+      <p class="text-muted">استعرض جميع الرحلات المتاحة وانضم إلى الرحلة المناسبة لك</p>
+    </div>
+    <% if user_signed_in? && current_user.driver? %>
+      <%= link_to new_ride_path, class: "btn btn-primary btn-lg" do %>
+        <i class="fas fa-plus me-2"></i>إضافة رحلة جديدة
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- فلترة الرحلات -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">🔍 فلترة الرحلات</h5>
+      <div class="row">
+        <div class="col-md-3 mb-2">
+          <input type="text" class="form-control" placeholder="من المدينة" id="filterFrom">
+        </div>
+        <div class="col-md-3 mb-2">
+          <input type="text" class="form-control" placeholder="إلى المدينة" id="filterTo">
+        </div>
+        <div class="col-md-3 mb-2">
+          <input type="date" class="form-control" id="filterDate">
+        </div>
+        <div class="col-md-3 mb-2">
+          <select class="form-select" id="filterSeats">
+            <option value="">عدد المقاعد</option>
+            <option value="1">1 مقعد</option>
+            <option value="2">2 مقاعد</option>
+            <option value="3">3+ مقاعد</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @rides.any? %>
+    <div class="row" id="ridesContainer">
+      <% @rides.each do |ride| %>
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4 ride-item"
+             data-from="<%= ride.from_city %>"
+             data-to="<%= ride.to_city %>"
+             data-date="<%= ride.departure_time.to_date %>"
+             data-seats="<%= ride.available_seats %>">
+          <div class="card h-100 shadow-sm ride-card">
+            <div class="card-header bg-primary text-white">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><%= ride.from_city %> → <%= ride.to_city %></h6>
+                <span class="badge bg-<%= ride.available_seats > 0 ? 'success' : 'secondary' %>">
+                  <%= ride.available_seats %> مقاعد
+                </span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="ride-info mb-3">
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-calendar-alt text-primary me-2"></i>
+                  <span><%= ride.departure_time.strftime("%Y/%m/%d") %></span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-clock text-primary me-2"></i>
+                  <span><%= ride.departure_time.strftime("%H:%M") %></span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-money-bill-wave text-primary me-2"></i>
+                  <span class="fw-bold text-success"><%= number_to_currency(ride.price, unit: "ل.س", precision: 0) %></span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user text-primary me-2"></i>
+                  <span><%= ride.driver.name %></span>
+                </div>
+              </div>
+
+              <% if ride.notes.present? %>
+                <div class="alert alert-light border mt-3">
+                  <small class="text-muted">
+                    <i class="fas fa-sticky-note me-1"></i>
+                    <%= truncate(ride.notes, length: 80) %>
+                  </small>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="card-footer bg-white">
+              <div class="d-grid gap-2">
+                <%= link_to ride_path(ride), class: "btn btn-outline-primary btn-sm" do %>
+                  <i class="fas fa-eye me-1"></i>عرض التفاصيل
+                <% end %>
+
+                <% if user_signed_in? %>
+                  <% if current_user == ride.driver %>
+                    <%= link_to edit_ride_path(ride), class: "btn btn-outline-warning btn-sm" do %>
+                      <i class="fas fa-edit me-1"></i>تعديل
+                    <% end %>
+                  <% elsif current_user.passenger? && ride.available_seats > 0 %>
+                    <%= link_to new_ride_booking_path(ride), class: "btn btn-success btn-sm" do %>
+                      <i class="fas fa-ticket-alt me-1"></i>حجز مقعد
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <%= link_to new_user_session_path, class: "btn btn-primary btn-sm" do %>
+                    <i class="fas fa-sign-in-alt me-1"></i>تسجيل الدخول للحجز
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-5">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        عرض <%= @rides.count %> رحلة من أصل <%= Ride.upcoming.available.count %> رحلة متاحة
+      </div>
+    </div>
+  <% else %>
+    <div class="text-center py-5">
+      <div class="empty-state">
+        <i class="fas fa-route fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">لا توجد رحلات حالياً</h3>
+        <p class="text-muted mb-4">لم يتم إضافة أي رحلات إلى المنصة بعد</p>
+        <% if user_signed_in? && current_user.driver? %>
+          <%= link_to new_ride_path, class: "btn btn-primary btn-lg" do %>
+            <i class="fas fa-plus me-2"></i>أضف أول رحلة
+          <% end %>
+        <% else %>
+          <%= link_to rides_path, class: "btn btn-outline-primary" do %>
+            <i class="fas fa-refresh me-2"></i>تحديث الصفحة
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+.ride-card {
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 15px;
+}
+
+.ride-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.ride-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.empty-state {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-sm {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterFrom = document.getElementById('filterFrom');
+  const filterTo = document.getElementById('filterTo');
+  const filterDate = document.getElementById('filterDate');
+  const filterSeats = document.getElementById('filterSeats');
+  const rideItems = document.querySelectorAll('.ride-item');
+
+  function filterRides() {
+    const fromValue = filterFrom.value.toLowerCase();
+    const toValue = filterTo.value.toLowerCase();
+    const dateValue = filterDate.value;
+    const seatsValue = filterSeats.value;
+
+    rideItems.forEach(item => {
+      const from = item.dataset.from.toLowerCase();
+      const to = item.dataset.to.toLowerCase();
+      const date = item.dataset.date;
+      const seats = item.dataset.seats;
+
+      const matchesFrom = from.includes(fromValue);
+      const matchesTo = to.includes(toValue);
+      const matchesDate = dateValue ? date === dateValue : true;
+      const matchesSeats = seatsValue ? seats >= seatsValue : true;
+
+      if (matchesFrom && matchesTo && matchesDate && matchesSeats) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  filterFrom.addEventListener('input', filterRides);
+  filterTo.addEventListener('input', filterRides);
+  filterDate.addEventListener('change', filterRides);
+  filterSeats.addEventListener('change', filterRides);
+});
+</script>

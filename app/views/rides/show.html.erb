@@ -1,0 +1,111 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">تفاصيل الرحلة</h2>
+            <% if @ride.available_seats > 0 %>
+              <span class="badge bg-success fs-6"><%= @ride.available_seats %> مقاعد متاحة</span>
+            <% else %>
+              <span class="badge bg-secondary fs-6">مكتمل</span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Route Information -->
+          <div class="route-info text-center mb-4 p-4 bg-light rounded">
+            <div class="d-flex justify-content-center align-items-center mb-3">
+              <span class="fs-3 fw-bold text-primary"><%= @ride.from_city %></span>
+              <i class="fas fa-arrow-right mx-3 text-muted fa-2x"></i>
+              <span class="fs-3 fw-bold text-primary"><%= @ride.to_city %></span>
+            </div>
+          </div>
+
+          <!-- Trip Details -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="detail-card card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary mb-3">
+                    <i class="fas fa-info-circle me-2"></i>معلومات الرحلة
+                  </h5>
+                  <div class="detail-item mb-2">
+                    <strong>وقت المغادرة:</strong>
+                    <span class="text-dark"><%= @ride.departure_time.strftime("%Y/%m/%d %H:%M") %></span>
+                  </div>
+                  <div class="detail-item mb-2">
+                    <strong>المقاعد المتاحة:</strong>
+                    <span class="text-dark"><%= @ride.available_seats %></span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>سعر المقعد:</strong>
+                    <span class="text-success fw-bold"><%= @ride.price %> ل.س</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="detail-card card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title text-primary mb-3">
+                    <i class="fas fa-user me-2"></i>معلومات السائق
+                  </h5>
+                  <div class="detail-item mb-2">
+                    <strong>الاسم:</strong>
+                    <span class="text-dark"><%= @ride.driver.name %></span>
+                  </div>
+                  <div class="detail-item mb-2">
+                    <strong>الهاتف:</strong>
+                    <span class="text-dark"><%= @ride.driver.phone %></span>
+                  </div>
+                  <div class="detail-item">
+                    <strong>البريد الإلكتروني:</strong>
+                    <span class="text-dark"><%= @ride.driver.email %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <% if @ride.notes.present? %>
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">ملاحظات السائق</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text"><%= @ride.notes %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 flex-wrap justify-content-center">
+            <%= link_to 'العودة إلى الرحلات', rides_path, class: 'btn btn-secondary' %>
+
+            <% if user_signed_in? %>
+              <% if current_user == @ride.driver %>
+                <%= link_to 'تعديل الرحلة', edit_ride_path(@ride), class: 'btn btn-warning' %>
+                <%= link_to 'حذف الرحلة', ride_path(@ride), method: :delete,
+                    data: { confirm: 'هل أنت متأكد من حذف هذه الرحلة؟' },
+                    class: 'btn btn-danger' %>
+              <% elsif current_user.passenger? %>
+                <% if @ride.available_seats > 0 %>
+                  <%= link_to 'حجز مقعد', new_ride_booking_path(@ride), class: 'btn btn-success btn-lg' %>
+                <% else %>
+                  <button class="btn btn-secondary" disabled>لا توجد مقاعد متاحة</button>
+                <% end %>
+              <% end %>
+            <% else %>
+              <%= link_to 'تسجيل الدخول للحجز', new_user_session_path, class: 'btn btn-primary' %>
+              <%= link_to 'إنشاء حساب', new_user_registration_path, class: 'btn btn-outline-primary' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

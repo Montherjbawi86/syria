@@ -1,0 +1,98 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <div class="container">
+    <%= link_to root_path, class: "navbar-brand" do %>
+      <i class="fas fa-car"></i>
+      وصلني بطريقك
+    <% end %>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <%= link_to "الرئيسية", root_path, class: "nav-link #{'active' if current_page?(root_path)}" %>
+        </li>
+
+        <% if user_signed_in? %>
+          <!-- رابط لوحة التحكم العادية -->
+          <li class="nav-item">
+            <%= link_to "لوحة التحكم", dashboard_path, class: "nav-link #{'active' if current_page?(dashboard_path)}" %>
+          </li>
+
+          <!-- رابط لوحة تحكم المدير (يظهر للمديرين فقط) -->
+          <% if current_user.admin? %>
+            <li class="nav-item">
+              <%= link_to admin_dashboard_path, class: "nav-link text-warning #{'active' if current_page?(admin_dashboard_path)}" do %>
+                <i class="fas fa-crown me-1"></i>إدارة النظام
+              <% end %>
+            </li>
+          <% end %>
+
+          <li class="nav-item">
+            <%= link_to "الرحلات", rides_path, class: "nav-link #{'active' if current_page?(rides_path)}" %>
+          </li>
+
+          <% if current_user.driver? %>
+            <li class="nav-item">
+              <%= link_to "إضافة رحلة", new_ride_path, class: "nav-link #{'active' if current_page?(new_ride_path)}" %>
+            </li>
+          <% end %>
+
+          <li class="nav-item">
+            <%= link_to "حجوزاتي", bookings_path, class: "nav-link #{'active' if current_page?(bookings_path)}" %>
+          </li>
+        <% else %>
+          <!-- الروابط للزوار غير المسجلين -->
+          <li class="nav-item">
+            <%= link_to "جميع الرحلات", rides_path, class: "nav-link #{'active' if current_page?(rides_path)}" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "كيفية العمل", how_it_works_path, class: "nav-link #{'active' if current_page?(how_it_works_path)}" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "عن المنصة", about_path, class: "nav-link #{'active' if current_page?(about_path)}" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "اتصل بنا", contact_path, class: "nav-link #{'active' if current_page?(contact_path)}" %>
+          </li>
+        <% end %>
+      </ul>
+
+      <ul class="navbar-nav">
+        <% if user_signed_in? %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-1"></i>
+              <%= current_user.name %>
+              <% if current_user.admin? %>
+                <span class="badge bg-warning ms-1">مدير</span>
+              <% elsif current_user.driver? %>
+                <span class="badge bg-info ms-1">سائق</span>
+              <% else %>
+                <span class="badge bg-success ms-1">راكب</span>
+              <% end %>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><%= link_to "الملف الشخصي", edit_user_registration_path, class: "dropdown-item" %></li>
+              <li><%= link_to "الإعدادات", "#", class: "dropdown-item" %></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <%= button_to "تسجيل الخروج", destroy_user_session_path, method: :delete,
+                    class: "dropdown-item border-0 bg-transparent", form: { class: "d-inline" } %>
+              </li>
+            </ul>
+          </li>
+        <% else %>
+          <li class="nav-item">
+            <%= link_to "تسجيل الدخول", new_user_session_path, class: "nav-link #{'active' if current_page?(new_user_session_path)}" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "إنشاء حساب", new_user_registration_path, class: "btn btn-outline-light" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>

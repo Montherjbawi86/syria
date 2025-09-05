@@ -1,0 +1,241 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary">
+          <i class="fas fa-users me-2"></i>إدارة المستخدمين
+        </h1>
+        <div>
+          <%= link_to 'جميع المستخدمين', admin_users_path, class: "btn btn-outline-primary btn-sm #{'active' unless params[:role]}" %>
+          <%= link_to 'السائقين', admin_users_path(role: 'driver'), class: "btn btn-outline-success btn-sm #{'active' if params[:role] == 'driver'}" %>
+          <%= link_to 'الركاب', admin_users_path(role: 'passenger'), class: "btn btn-outline-info btn-sm #{'active' if params[:role] == 'passenger'}" %>
+          <%= link_to 'المديرين', admin_users_path(role: 'admin'), class: "btn btn-outline-warning btn-sm #{'active' if params[:role] == 'admin'}" %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <% if @users.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>البريد</th>
+                    <th>الهاتف</th>
+                    <th>الدور</th>
+                    <th>تاريخ التسجيل</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @users.each do |user| %>
+                    <tr>
+                      <td><%= user.id %></td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0">
+                            <div class="bg-<%= user_badge_color(user.role) %> text-white rounded-circle p-2">
+                              <i class="fas fa-user"></i>
+                            </div>
+                          </div>
+                          <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0"><%= user.name %></h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td><%= user.email %></td>
+                      <td><%= user.phone %></td>
+                      <td>
+                        <span class="badge bg-<%= user_badge_color(user.role) %>">
+                          <%= user.role %>
+                        </span>
+                      </td>
+                      <td><%= l(user.created_at, format: :short) %></td>
+                      <td>
+                        <div class="btn-group">
+                          <!-- عرض معلومات المستخدم في modal -->
+                          <button class="btn btn-info btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#userModal<%= user.id %>">
+                            عرض
+                          </button>
+
+                          <!-- حذف المستخدم -->
+                          <button class="btn btn-danger btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteUserModal<%= user.id %>">
+                            حذف
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="text-center py-5">
+              <i class="fas fa-users fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted">لا يوجد مستخدمين</h5>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals للمستخدمين -->
+<% @users.each do |user| %>
+  <!-- Modal لعرض المستخدم -->
+  <div class="modal fade" id="userModal<%= user.id %>" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">معلومات المستخدم #<%= user.id %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <strong>الاسم الكامل:</strong><br>
+              <%= user.name %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>البريد الإلكتروني:</strong><br>
+              <%= user.email %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>رقم الهاتف:</strong><br>
+              <%= user.phone %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>الدور:</strong><br>
+              <span class="badge bg-<%= user_badge_color(user.role) %>">
+                <%= user.role %>
+              </span>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>تاريخ التسجيل:</strong><br>
+              <%= l(user.created_at, format: :long) %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>آخر تحديث:</strong><br>
+              <%= l(user.updated_at, format: :long) if user.updated_at %>
+            </div>
+            <% if user.driver? %>
+              <div class="col-12 mt-3">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <h6 class="card-title">معلومات السائق</h6>
+                    <p class="mb-1">عدد الرحلات: <%= user.rides.count %></p>
+                    <p class="mb-0">الحجوزات المقبولة: <%= user.rides.joins(:bookings).where(bookings: { status: 'confirmed' }).count %></p>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal لتأكيد الحذف -->
+  <div class="modal fade" id="deleteUserModal<%= user.id %>" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">تأكيد الحذف</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>هل أنت متأكد من حذف المستخدم التالي؟</p>
+          <div class="alert alert-danger">
+            <strong>الاسم:</strong> <%= user.name %><br>
+            <strong>البريد:</strong> <%= user.email %><br>
+            <strong>الدور:</strong> <%= user.role %>
+          </div>
+          <p class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            تحذير: هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع بيانات المستخدم المرتبطة.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <%= button_to 'نعم، احذف', admin_destroy_user_path(user),
+              method: :delete,
+              class: 'btn btn-danger',
+              form: { class: 'd-inline' } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<style>
+.card {
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+  background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+  border-radius: 0.375rem;
+}
+
+.modal-header {
+  border-bottom: 2px solid #0d6efd;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.alert {
+  border-left: 4px solid #dc3545;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // إضافة تأثيرات للجدول
+  const tableRows = document.querySelectorAll('.table tbody tr');
+  tableRows.forEach(row => {
+    row.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(4px)';
+      this.style.transition = 'transform 0.2s ease';
+    });
+
+    row.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(0)';
+    });
+  });
+
+  // إدارة حالة أزرار التصفية
+  const filterButtons = document.querySelectorAll('.btn-outline-primary, .btn-outline-success, .btn-outline-info, .btn-outline-warning');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+</script>

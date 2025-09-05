@@ -1,0 +1,351 @@
+<div class="container py-5">
+  <!-- رأس لوحة التحكم -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="text-primary fw-bold mb-2">لوحة التحكم</h1>
+          <p class="text-muted">
+            <% if current_user.driver? %>
+              <i class="fas fa-car me-2"></i>مرحباً بك أيها السائق
+            <% else %>
+              <i class="fas fa-user me-2"></i>مرحباً بك أيها المسافر
+            <% end %>
+          </p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-primary fs-6">
+            <%= current_user.name %>
+          </span>
+          <p class="text-muted mb-0">
+            <%= current_user.driver? ? 'سائق' : 'راكب' %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if current_user.driver? %>
+    <!-- لوحة تحكم السائق -->
+    <div class="row mb-5">
+      <!-- بطاقات الإحصائيات -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-primary mb-3">
+              <i class="fas fa-route fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-primary"><%= @rides.count %></h2>
+            <p class="text-muted mb-0">إجمالي الرحلات</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-success mb-3">
+              <i class="fas fa-users fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-success"><%= @unique_passengers %></h2>
+            <p class="text-muted mb-0">عدد الركاب</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-warning mb-3">
+              <i class="fas fa-money-bill-wave fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-warning"><%= number_to_currency(@total_earnings, unit: "ل.س", precision: 0) %></h2>
+            <p class="text-muted mb-0">إجمالي الأرباح</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-info mb-3">
+              <i class="fas fa-ticket-alt fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-info"><%= @total_bookings.count %></h2>
+            <p class="text-muted mb-0">إجمالي الحجوزات</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم الرحلات -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-list me-2"></i>
+              رحلاتي
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 text-center mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-success fw-bold"><%= @active_rides.count %></h3>
+                  <p class="text-muted mb-0">رحلات قادمة</p>
+                </div>
+              </div>
+              <div class="col-md-4 text-center mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-secondary fw-bold"><%= @completed_rides.count %></h3>
+                  <p class="text-muted mb-0">رحلات منتهية</p>
+                </div>
+              </div>
+              <div class="col-md-4 text-center mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-warning fw-bold"><%= @pending_bookings.count %></h3>
+                  <p class="text-muted mb-0">حجوزات pending</p>
+                </div>
+              </div>
+            </div>
+
+            <% if @active_rides.any? %>
+              <div class="mt-4">
+                <h6 class="text-primary mb-3">الرحلات القادمة القريبة:</h6>
+                <div class="row">
+                  <% @active_rides.limit(3).each do |ride| %>
+                    <div class="col-md-4 mb-3">
+                      <div class="card border-primary">
+                        <div class="card-body">
+                          <h6 class="card-title"><%= ride.from_city %> → <%= ride.to_city %></h6>
+                          <p class="card-text mb-1">
+                            <small><%= ride.departure_time.strftime("%Y/%m/%d %H:%M") %></small>
+                          </p>
+                          <p class="card-text mb-1">
+                            <span class="badge bg-success"><%= ride.available_seats %> مقاعد</span>
+                          </p>
+                          <%= link_to 'عرض التفاصيل', ride_path(ride), class: 'btn btn-sm btn-outline-primary mt-2' %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم الحجوزات -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-lg">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-line me-2"></i>
+              الإحصائيات المالية
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-success fw-bold"><%= number_to_currency(@total_earnings, unit: "ل.س", precision: 0) %></h4>
+                  <p class="text-muted mb-0">أرباح مؤكدة</p>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-warning fw-bold"><%= number_to_currency(@potential_earnings, unit: "ل.س", precision: 0) %></h4>
+                  <p class="text-muted mb-0">أرباح محتملة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% else %>
+    <!-- لوحة تحكم الراكب -->
+    <div class="row mb-5">
+      <!-- بطاقات الإحصائيات -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-primary mb-3">
+              <i class="fas fa-ticket-alt fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-primary"><%= @bookings.count %></h2>
+            <p class="text-muted mb-0">إجمالي الحجوزات</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-success mb-3">
+              <i class="fas fa-route fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-success"><%= @total_rides %></h2>
+            <p class="text-muted mb-0">رحلات مختلفة</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-warning mb-3">
+              <i class="fas fa-city fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-warning"><%= @cities_visited %></h2>
+            <p class="text-muted mb-0">مدن زُرتها</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100 py-3">
+          <div class="card-body text-center">
+            <div class="text-info mb-3">
+              <i class="fas fa-money-bill-wave fa-3x"></i>
+            </div>
+            <h2 class="fw-bold text-info"><%= number_to_currency(@total_spent, unit: "ل.س", precision: 0) %></h2>
+            <p class="text-muted mb-0">إجمالي المصروف</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم الحجوزات -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-calendar-check me-2"></i>
+              حجوزاتي
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-4 mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-success fw-bold"><%= @upcoming_bookings.count %></h3>
+                  <p class="text-muted mb-0">حجوزات قادمة</p>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-secondary fw-bold"><%= @completed_bookings.count %></h3>
+                  <p class="text-muted mb-0">حجوزات منتهية</p>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="bg-light p-4 rounded">
+                  <h3 class="text-warning fw-bold"><%= @bookings.pending.count %></h3>
+                  <p class="text-muted mb-0">حجوزات pending</p>
+                </div>
+              </div>
+            </div>
+
+            <% if @upcoming_bookings.any? %>
+              <div class="mt-4">
+                <h6 class="text-primary mb-3">حجوزاتي القادمة:</h6>
+                <div class="row">
+                  <% @upcoming_bookings.limit(3).each do |booking| %>
+                    <div class="col-md-4 mb-3">
+                      <div class="card border-success">
+                        <div class="card-body">
+                          <h6 class="card-title"><%= booking.ride.from_city %> → <%= booking.ride.to_city %></h6>
+                          <p class="card-text mb-1">
+                            <small><%= booking.ride.departure_time.strftime("%Y/%m/%d %H:%M") %></small>
+                          </p>
+                          <p class="card-text mb-1">
+                            <span class="badge bg-info"><%= booking.seats %> مقاعد</span>
+                          </p>
+                          <p class="card-text mb-1">
+                            <span class="badge bg-<%= booking_status_color(booking.status) %>">
+                              <%= booking.status %>
+                            </span>
+                          </p>
+                          <%= link_to 'عرض التفاصيل', booking_path(booking), class: 'btn btn-sm btn-outline-success mt-2' %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- إجراءات سريعة -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow-lg">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-bolt me-2"></i>
+            إجراءات سريعة
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex gap-3 flex-wrap">
+            <% if current_user.driver? %>
+              <%= link_to new_ride_path, class: "btn btn-primary btn-lg" do %>
+                <i class="fas fa-plus me-2"></i>إضافة رحلة جديدة
+              <% end %>
+            <% end %>
+            <%= link_to rides_path, class: "btn btn-success btn-lg" do %>
+              <i class="fas fa-search me-2"></i>استعرض الرحلات
+            <% end %>
+            <%= link_to bookings_path, class: "btn btn-warning btn-lg" do %>
+              <i class="fas fa-ticket-alt me-2"></i>عرض الحجوزات
+            <% end %>
+            <%= link_to edit_user_registration_path, class: "btn btn-info btn-lg" do %>
+              <i class="fas fa-user-edit me-2"></i>تعديل الملف الشخصي
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0 !important;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.btn-lg {
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+}
+
+.text-primary { color: #0d6efd !important; }
+.text-success { color: #198754 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-info { color: #0dcaf0 !important; }
+</style>

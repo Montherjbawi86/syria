@@ -1,0 +1,329 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-primary">
+          <i class="fas fa-ticket-alt me-2"></i>إدارة الحجوزات
+        </h1>
+        <div>
+          <%= link_to 'جميع الحجوزات', admin_bookings_path, class: "btn btn-outline-primary btn-sm #{'active' unless params[:status]}" %>
+          <%= link_to 'قيد الانتظار', admin_bookings_path(status: 'pending'), class: "btn btn-outline-warning btn-sm #{'active' if params[:status] == 'pending'}" %>
+          <%= link_to 'مؤكدة', admin_bookings_path(status: 'confirmed'), class: "btn btn-outline-success btn-sm #{'active' if params[:status] == 'confirmed'}" %>
+          <%= link_to 'ملغاة', admin_bookings_path(status: 'canceled'), class: "btn btn-outline-danger btn-sm #{'active' if params[:status] == 'canceled'}" %>
+          <%= link_to 'مرفوضة', admin_bookings_path(status: 'rejected'), class: "btn btn-outline-secondary btn-sm #{'active' if params[:status] == 'rejected'}" %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <% if @bookings.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>الراكب</th>
+                    <th>الرحلة</th>
+                    <th>المقاعد</th>
+                    <th>السعر</th>
+                    <th>الحالة</th>
+                    <th>التاريخ</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @bookings.each do |booking| %>
+                    <tr>
+                      <td><%= booking.id %></td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0">
+                            <div class="bg-info text-white rounded-circle p-2">
+                              <i class="fas fa-user"></i>
+                            </div>
+                          </div>
+                          <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0"><%= booking.passenger.name %></h6>
+                            <small class="text-muted"><%= booking.passenger.phone %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <%= booking.ride.from_city %> → <%= booking.ride.to_city %>
+                        <br>
+                        <small class="text-muted">بواسطة: <%= booking.ride.driver.name %></small>
+                      </td>
+                      <td><%= booking.seats %></td>
+                      <td><%= number_to_currency(booking.seats * booking.ride.price) %></td>
+                      <td>
+                        <span class="badge bg-<%= booking_status_color(booking.status) %>">
+                          <%= booking.status %>
+                        </span>
+                      </td>
+                      <td><%= l(booking.created_at, format: :short) %></td>
+                      <td>
+                        <div class="btn-group">
+                          <!-- عرض معلومات الحجز -->
+                          <button class="btn btn-info btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#bookingModal<%= booking.id %>">
+                            <i class="fas fa-eye"></i>
+                          </button>
+
+                          <!-- تعديل حالة الحجز -->
+                          <button class="btn btn-warning btn-sm"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editBookingModal<%= booking.id %>">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="text-center py-5">
+              <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted">لا يوجد حجوزات</h5>
+              <% if params[:status] %>
+                <p class="text-muted">لا توجد حجوزات بحالة "<%= params[:status] %>"</p>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals للحجوزات -->
+<% @bookings.each do |booking| %>
+  <!-- Modal لعرض الحجز -->
+  <div class="modal fade" id="bookingModal<%= booking.id %>" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">تفاصيل الحجز #<%= booking.id %></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">معلومات الحجز</h6>
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>رقم الحجز:</strong>
+                    <span class="fw-bold">#<%= booking.id %></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>عدد المقاعد:</strong>
+                    <span class="badge bg-info"><%= booking.seats %></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>الحالة:</strong>
+                    <span class="badge bg-<%= booking_status_color(booking.status) %>">
+                      <%= booking.status %>
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>المبلغ الإجمالي:</strong>
+                    <span class="fw-bold text-success">
+                      <%= number_to_currency(booking.seats * booking.ride.price) %>
+                    </span>
+                  </div>
+                  <% if booking.notes.present? %>
+                    <div class="mt-3">
+                      <strong>ملاحظات:</strong>
+                      <p class="mb-0"><%= booking.notes %></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">معلومات الراكب</h6>
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="flex-shrink-0">
+                      <div class="bg-info text-white rounded-circle p-2">
+                        <i class="fas fa-user"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <h6 class="mb-0"><%= booking.passenger.name %></h6>
+                      <small class="text-muted"><%= booking.passenger.email %></small>
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <strong>الهاتف:</strong> <%= booking.passenger.phone %>
+                  </div>
+                  <div>
+                    <strong>عدد الحجوزات:</strong> <%= booking.passenger.bookings.count %>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 mb-3">
+              <h6 class="text-primary">معلومات الرحلة</h6>
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <strong>المسار:</strong>
+                      <p class="mb-0"><%= booking.ride.from_city %> → <%= booking.ride.to_city %></p>
+                    </div>
+                    <div class="col-md-4">
+                      <strong>وقت المغادرة:</strong>
+                      <p class="mb-0">
+                        <%= booking.ride.departure_time ? l(booking.ride.departure_time, format: :long) : 'غير محدد' %>
+                      </p>
+                    </div>
+                    <div class="col-md-4">
+                      <strong>السائق:</strong>
+                      <p class="mb-0"><%= booking.ride.driver.name %></p>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-md-4">
+                      <strong>المقاعد المتاحة:</strong>
+                      <p class="mb-0"><%= booking.ride.available_seats %></p>
+                    </div>
+                    <div class="col-md-4">
+                      <strong>سعر المقعد:</strong>
+                      <p class="mb-0"><%= number_to_currency(booking.ride.price) %></p>
+                    </div>
+                    <div class="col-md-4">
+                      <strong>الحجوزات:</strong>
+                      <p class="mb-0"><%= booking.ride.bookings.count %></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal لتعديل حالة الحجز -->
+  <div class="modal fade" id="editBookingModal<%= booking.id %>" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-white">
+          <h5 class="modal-title">تعديل حالة الحجز #<%= booking.id %></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <%= form_with(model: booking, url: booking_path(booking), method: :patch) do |form| %>
+          <div class="modal-body">
+            <div class="mb-3">
+              <%= form.label :status, "حالة الحجز", class: "form-label fw-bold" %>
+              <%= form.select :status,
+                  options_for_select([
+                    ['قيد الانتظار', 'pending'],
+                    ['مؤكد', 'confirmed'],
+                    ['ملغي', 'canceled'],
+                    ['مرفوض', 'rejected']
+                  ], booking.status),
+                  {}, class: "form-select" %>
+            </div>
+            <% if booking.notes.present? %>
+              <div class="mb-3">
+                <strong>ملاحظات الحجز:</strong>
+                <p class="text-muted"><%= booking.notes %></p>
+              </div>
+            <% end %>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            <%= form.submit "حفظ التغييرات", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<style>
+.card {
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+  background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+  border-radius: 0.375rem;
+}
+
+.modal-header {
+  border-bottom: 2px solid #0d6efd;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.badge {
+  font-size: 0.85em;
+  padding: 0.5em 0.8em;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // إدارة حالة أزرار التصفية
+  const filterButtons = document.querySelectorAll('.btn-outline-primary, .btn-outline-warning, .btn-outline-success, .btn-outline-danger, .btn-outline-secondary');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // إضافة تأثيرات للجدول
+  const tableRows = document.querySelectorAll('.table tbody tr');
+  tableRows.forEach(row => {
+    row.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(4px)';
+      this.style.transition = 'transform 0.2s ease';
+    });
+
+    row.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(0)';
+    });
+  });
+
+  // إدارة حالة selects في modals
+  const bookingModals = document.querySelectorAll('[id^="editBookingModal"]');
+  bookingModals.forEach(modal => {
+    modal.addEventListener('show.bs.modal', function() {
+      const select = this.querySelector('select');
+      if (select) {
+        select.focus();
+      }
+    });
+  });
+});
+</script>

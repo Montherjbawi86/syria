@@ -1,0 +1,297 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h1 class="text-primary fw-bold mb-2">
+        <i class="fas fa-ticket-alt me-2"></i>حجوزاتي
+      </h1>
+      <p class="text-muted">إدارة جميع حجوزاتك في مكان واحد</p>
+    </div>
+    <%= link_to rides_path, class: "btn btn-primary btn-lg" do %>
+      <i class="fas fa-search me-2"></i>استعرض الرحلات
+    <% end %>
+  </div>
+
+  <!-- فلترة الحجوزات -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">🔍 فلترة الحجوزات</h5>
+      <div class="row">
+        <div class="col-md-3 mb-2">
+          <select class="form-select" id="filterStatus">
+            <option value="">جميع الحالات</option>
+            <option value="pending">قيد الانتظار</option>
+            <option value="confirmed">مؤكد</option>
+            <option value="canceled">ملغي</option>
+            <option value="rejected">مرفوض</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-2">
+          <input type="date" class="form-control" id="filterDate" placeholder="تاريخ الرحلة">
+        </div>
+        <div class="col-md-3 mb-2">
+          <input type="text" class="form-control" id="filterCity" placeholder="اسم المدينة">
+        </div>
+        <div class="col-md-3 mb-2">
+          <button class="btn btn-outline-secondary w-100" id="resetFilters">
+            <i class="fas fa-refresh me-2"></i>إعادة تعيين
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @bookings.any? %>
+    <div class="row" id="bookingsContainer">
+      <% @bookings.each do |booking| %>
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4 booking-item"
+             data-status="<%= booking.status %>"
+             data-date="<%= booking.ride.departure_time.to_date %>"
+             data-city="<%= booking.ride.to_city %>">
+          <div class="card h-100 shadow-sm booking-card">
+            <div class="card-header" style="background: linear-gradient(135deg, <%= booking_status_color(booking.status) %> 0%, #6c757d 100%); color: white;">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">حجز #<%= booking.id %></h6>
+                <span class="badge bg-light text-dark">
+                  <%= booking_status_text(booking.status) %>
+                </span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- معلومات الرحلة -->
+              <div class="booking-info mb-3">
+                <h6 class="text-primary mb-3">
+                  <i class="fas fa-route me-2"></i>
+                  <%= booking.ride.from_city %> → <%= booking.ride.to_city %>
+                </h6>
+
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-calendar-alt text-primary me-2"></i>
+                  <span><%= booking.ride.departure_time.strftime("%Y/%m/%d") %></span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-clock text-primary me-2"></i>
+                  <span><%= booking.ride.departure_time.strftime("%H:%M") %></span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-users text-primary me-2"></i>
+                  <span><%= booking.seats %> مقاعد</span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fas fa-money-bill-wave text-primary me-2"></i>
+                  <span class="fw-bold text-success">
+                    <%= number_to_currency(booking.seats * booking.ride.price, unit: "ل.س", precision: 0) %>
+                  </span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user text-primary me-2"></i>
+                  <span><%= booking.ride.driver.name %></span>
+                </div>
+              </div>
+
+              <!-- معلومات إضافية -->
+              <div class="booking-meta">
+                <div class="d-flex justify-content-between align-items-center text-muted small">
+                  <span>
+                    <i class="fas fa-calendar-plus me-1"></i>
+                    <%= booking.created_at.strftime("%Y/%m/%d") %>
+                  </span>
+                  <span>
+                    <i class="fas fa-hashtag me-1"></i>
+                    <%= booking.ride_id %>
+                  </span>
+                </div>
+              </div>
+
+              <% if booking.notes.present? %>
+                <div class="alert alert-light border mt-3">
+                  <small class="text-muted">
+                    <i class="fas fa-sticky-note me-1"></i>
+                    <%= truncate(booking.notes, length: 60) %>
+                  </small>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="card-footer bg-white">
+              <div class="d-grid gap-2">
+                <%= link_to booking_path(booking), class: "btn btn-outline-primary btn-sm" do %>
+                  <i class="fas fa-eye me-1"></i>عرض التفاصيل
+                <% end %>
+
+                <% if current_user == booking.passenger && booking.pending? %>
+                  <%= button_to booking_path(booking), method: :delete,
+                      data: { confirm: 'هل أنت متأكد من إلغاء هذا الحجز؟' },
+                      class: "btn btn-outline-danger btn-sm" do %>
+                    <i class="fas fa-times me-1"></i>إلغاء الحجز
+                  <% end %>
+                <% end %>
+
+                <% if current_user == booking.ride.driver && booking.pending? %>
+                  <div class="btn-group w-100">
+                    <%= button_to confirm_booking_path(booking), method: :post,
+                        class: "btn btn-success btn-sm" do %>
+                      <i class="fas fa-check me-1"></i>قبول
+                    <% end %>
+                    <%= button_to reject_booking_path(booking), method: :post,
+                        class: "btn btn-warning btn-sm" do %>
+                      <i class="fas fa-times me-1"></i>رفض
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- إحصائيات الحجوزات -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">📊 إحصائيات الحجوزات</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-3 col-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-primary fw-bold"><%= @bookings.count %></h4>
+                  <p class="text-muted mb-0">إجمالي الحجوزات</p>
+                </div>
+              </div>
+              <div class="col-md-3 col-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-success fw-bold"><%= @bookings.confirmed.count %></h4>
+                  <p class="text-muted mb-0">مؤكدة</p>
+                </div>
+              </div>
+              <div class="col-md-3 col-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-warning fw-bold"><%= @bookings.pending.count %></h4>
+                  <p class="text-muted mb-0">قيد الانتظار</p>
+                </div>
+              </div>
+              <div class="col-md-3 col-6 mb-3">
+                <div class="bg-light p-3 rounded">
+                  <h4 class="text-danger fw-bold"><%= @bookings.canceled.count + @bookings.rejected.count %></h4>
+                  <p class="text-muted mb-0">ملغية/مرفوضة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% else %>
+    <div class="text-center py-5">
+      <div class="empty-state">
+        <i class="fas fa-ticket-alt fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">لا توجد حجوزات</h3>
+        <p class="text-muted mb-4">لم تقم بأي حجوزات حتى الآن</p>
+        <%= link_to rides_path, class: "btn btn-primary btn-lg" do %>
+          <i class="fas fa-search me-2"></i>استعرض الرحلات المتاحة
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+.booking-card {
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 15px;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.booking-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.empty-state {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-sm {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.btn-group .btn:last-child {
+  border-radius: 0 8px 8px 0;
+}
+.badge {
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 25px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterStatus = document.getElementById('filterStatus');
+  const filterDate = document.getElementById('filterDate');
+  const filterCity = document.getElementById('filterCity');
+  const resetFilters = document.getElementById('resetFilters');
+  const bookingItems = document.querySelectorAll('.booking-item');
+
+  function filterBookings() {
+    const statusValue = filterStatus.value;
+    const dateValue = filterDate.value;
+    const cityValue = filterCity.value.toLowerCase();
+
+    bookingItems.forEach(item => {
+      const status = item.dataset.status;
+      const date = item.dataset.date;
+      const city = item.dataset.city.toLowerCase();
+
+      const matchesStatus = statusValue ? status === statusValue : true;
+      const matchesDate = dateValue ? date === dateValue : true;
+      const matchesCity = cityValue ? city.includes(cityValue) : true;
+
+      if (matchesStatus && matchesDate && matchesCity) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  filterStatus.addEventListener('change', filterBookings);
+  filterDate.addEventListener('change', filterBookings);
+  filterCity.addEventListener('input', filterBookings);
+
+  resetFilters.addEventListener('click', function() {
+    filterStatus.value = '';
+    filterDate.value = '';
+    filterCity.value = '';
+    filterBookings();
+  });
+
+  // تطبيق الفلتر الأولي
+  filterBookings();
+});
+</script>
