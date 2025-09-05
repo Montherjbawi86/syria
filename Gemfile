@@ -29,7 +29,7 @@ gem "rails-i18n"       # للدعم العربي
 
 # Database
 gem "pg", group: :production
-gem "sqlite3", group: [:development, :test]
+gem "sqlite3", group: [:development]
 
 # XML/HTML parsing
 gem "nokogiri", ">= 1.13.10"
